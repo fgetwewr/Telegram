@@ -6,6 +6,8 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 import logging
+
+import requests
 import scrapy
 from scrapy import signals
 import random
@@ -29,21 +31,25 @@ class ProxyMiddleWare(object):
         if response.status != 200:
             proxy = self.get_random_proxy()
             print("this is response ip:" + proxy)
-            # 对当前reque加上代理
+            # 对当前request加上代理
             request.meta['proxy'] = proxy
             return request
         return response
 
     def get_random_proxy(self):
         '''随机从文件中读取proxy'''
-        while 1:
-            with open(r'C:\Users\shuai\Desktop\project\Telegram\Telegram\Telegram\spiders\proxies.txt', 'r') as f:
-                proxies = f.readlines()
-            if proxies:
-                break
-            else:
-                time.sleep(1)
-        proxy = random.choice(proxies).strip()
+        # while 1:
+        #     with open(r'C:\Users\shuai\Desktop\project\Telegram\Telegram\Telegram\spiders\proxies.txt', 'r') as f:
+        #         proxies = f.readlines()
+        #     if proxies:
+        #         break
+        #     else:
+        #         time.sleep(1)
+        # proxy = random.choice(proxies).strip()
+
+        proxy = 'http://' + requests.get('http://127.0.0.1:5555/random').text
+        print('***************************************************')
+        print(proxy)
         return proxy
 
 
