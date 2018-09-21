@@ -47,9 +47,9 @@ class ProxyMiddleWare(object):
         #         time.sleep(1)
         # proxy = random.choice(proxies).strip()
 
-        proxy = 'http://' + requests.get('http://127.0.0.1:5555/random').text
+        proxy = 'https://' + requests.get('http://192.168.52.159:5000/random').text
         print('***************************************************')
-        print(proxy)
+        # print(proxy)
         return proxy
 
 
