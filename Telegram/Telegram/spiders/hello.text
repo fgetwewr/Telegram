@@ -1,0 +1,6 @@
+fake-useragent==0.1.10
+lxml==4.2.5
+PyMySQL==0.9.2
+requests==2.19.1
+Scrapy==1.5.1
+Twisted==18.7.0

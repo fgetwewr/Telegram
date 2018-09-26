@@ -5,53 +5,46 @@
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-import logging
-
-import requests
-import scrapy
-from scrapy import signals
+# import logging
 import random
-import time
-from scrapy import log
+import requests
+from scrapy import signals
+# from fake_useragent import UserAgent
+from scrapy import signals
+from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
 
 
 # logger = logging.getLogger()
 class ProxyMiddleWare(object):
     """docstring for ProxyMiddleWare"""
+    def process_request(self, request, spider):
+        proxy = requests.get('http://192.168.52.159:5000/random').text
+        if request.url.startswith('http://'):
+            print('---------------http://{}'.format(proxy))
+            request.meta['proxy'] = 'http://' + proxy
+        else:
+            print('---------------https://{}'.format(proxy))
+            request.meta['proxy'] = 'https://' + proxy
+
+
+class RandomUserAgentMiddleware(object):
+    """
+    随机更换User-Agent
+    """
+    def __init__(self, user_agent=''):
+        self.user_agent = user_agent
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            user_agent=crawler.settings.get('MY_USER_AGENT')
+        )
 
     def process_request(self, request, spider):
-        '''对request对象加上proxy'''
-        proxy = self.get_random_proxy()
-        print("this is request ip:" + proxy)
-        request.meta['proxy'] = proxy
-
-    def process_response(self, request, response, spider):
-        '''对返回的response处理'''
-        # 如果返回的response状态不是200，重新生成当前request对象
-        if response.status != 200:
-            proxy = self.get_random_proxy()
-            print("this is response ip:" + proxy)
-            # 对当前request加上代理
-            request.meta['proxy'] = proxy
-            return request
-        return response
-
-    def get_random_proxy(self):
-        '''随机从文件中读取proxy'''
-        # while 1:
-        #     with open(r'C:\Users\shuai\Desktop\project\Telegram\Telegram\Telegram\spiders\proxies.txt', 'r') as f:
-        #         proxies = f.readlines()
-        #     if proxies:
-        #         break
-        #     else:
-        #         time.sleep(1)
-        # proxy = random.choice(proxies).strip()
-
-        proxy = 'https://' + requests.get('http://192.168.52.159:5000/random').text
-        print('***************************************************')
-        # print(proxy)
-        return proxy
-
+        agent = random.choice(self.user_agent)
+        print('*************************************')
+        print(agent)
+        request.headers['User-Agent'] = agent
 
 class TelegramSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
